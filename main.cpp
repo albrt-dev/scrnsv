@@ -1,41 +1,34 @@
+#include "screenshot.h"
+#include "trayicon.h"
+
 #include <QApplication>
 #include <QClipboard>
-#include <QMenu>
-#include <QScreen>
-#include <QSystemTrayIcon>
 
-void screenShot()
+void processScreenshot(const QPixmap& image)
 {
-    QScreen* screen = qApp->screens().at(0);
-    QPixmap image = screen->grabWindow(0);
-
-    QApplication::beep();
-
     qApp->clipboard()->setPixmap(image);
+    qApp->beep();
+}
+
+void showNotification(TrayIcon* const trayIcon, const QPixmap& image)
+{
+    trayIcon->showMessage("Screenshot has been copied to clipboard", "Paste screenshot wherever you want", image);
 }
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QSystemTrayIcon trayIcon;
-    trayIcon.setIcon(QIcon(":/icon.png"));
+    Screenshot screenshot;
 
-    QMenu menu;
+    TrayIcon trayIcon;
 
-    QAction screenShotAction("Screenshot");
-    QObject::connect(&screenShotAction, &QAction::triggered, &screenShotAction, [](){ screenShot(); });
+    QObject::connect(&trayIcon, &TrayIcon::screenshotRequested, &screenshot, &Screenshot::shot);
+    QObject::connect(&trayIcon, &TrayIcon::exitRequested, qApp, &QApplication::quit);
 
-    menu.addAction(&screenShotAction);
+    QObject::connect(&screenshot, &Screenshot::ready, qApp,
+                     [&trayIcon](const QPixmap& image) { processScreenshot(image); showNotification(&trayIcon, image); });
 
-    QAction exitAction("Exit");
-    QObject::connect(&exitAction, &QAction::triggered, &exitAction, [](){ qApp->exit(); });
-
-    menu.addAction(&exitAction);
-
-    trayIcon.setContextMenu(&menu);
-
-    trayIcon.setVisible(true);
     trayIcon.show();
 
     return a.exec();
