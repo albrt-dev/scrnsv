@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.19)
 
 project(scrnsv LANGUAGES CXX)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${CMAKE_SOURCE_DIR}/bin/Debug)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin/Release)
+
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
 set(CMAKE_AUTOMOC ON)

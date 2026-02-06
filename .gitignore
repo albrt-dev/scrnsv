@@ -1,3 +1,6 @@
+# Binary directories
+bin/
+
 # Build directories
 build/
 
