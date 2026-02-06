@@ -14,7 +14,9 @@ public:
     void showMessage(const QString& title, const QString& text, const QPixmap& image);
 
 signals:
-    void screenshotRequested();
+    void areaScreenRequested();
+    void fullScreenRequested();
+
     void exitRequested();
 
 private:

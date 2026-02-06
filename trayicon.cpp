@@ -14,7 +14,9 @@ void TrayIcon::init()
 
     QMenu* menu = new QMenu;
 
-    menu->addAction("Make screenshot", QKeySequence(), this, &TrayIcon::screenshotRequested);
+    menu->addAction("Area screen", QKeySequence(), this, &TrayIcon::areaScreenRequested);
+    menu->addAction("Full screen", QKeySequence(), this, &TrayIcon::fullScreenRequested);
+
     menu->addAction("Quit", QKeySequence(), this, &TrayIcon::exitRequested);
 
     trayIcon_.setContextMenu(menu);

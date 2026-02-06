@@ -18,12 +18,15 @@ void showNotification(TrayIcon* const trayIcon, const QPixmap& image)
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setQuitOnLastWindowClosed(false);
 
     Screenshot screenshot;
 
     TrayIcon trayIcon;
 
-    QObject::connect(&trayIcon, &TrayIcon::screenshotRequested, &screenshot, &Screenshot::shot);
+    QObject::connect(&trayIcon, &TrayIcon::areaScreenRequested, &screenshot, &Screenshot::shotAreaScreen);
+    QObject::connect(&trayIcon, &TrayIcon::fullScreenRequested, &screenshot, &Screenshot::shotFullScreen);
+
     QObject::connect(&trayIcon, &TrayIcon::exitRequested, qApp, &QApplication::quit);
 
     QObject::connect(&screenshot, &Screenshot::ready, qApp,

@@ -9,6 +9,6 @@ set(CMAKE_AUTORCC ON)
 
 add_executable(scrnsv main.cpp)
 
-target_sources(scrnsv PRIVATE screenshot.h screenshot.cpp trayicon.h trayicon.cpp resources.qrc)
+target_sources(scrnsv PRIVATE trayicon.h trayicon.cpp resources.qrc screenshot.h screenshot.cpp overlay.h overlay.cpp)
 
 target_link_libraries(scrnsv PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)

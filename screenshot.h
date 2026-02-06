@@ -10,7 +10,8 @@ class Screenshot : public QObject
 public:
     explicit Screenshot(QObject* parent = nullptr);
 
-    void shot();
+    void shotAreaScreen();
+    void shotFullScreen();
 
 signals:
     void ready(const QPixmap& image);
