@@ -15,3 +15,5 @@ add_executable(scrnsv main.cpp)
 target_sources(scrnsv PRIVATE trayicon.h trayicon.cpp resources.qrc screenshot.h screenshot.cpp overlay.h overlay.cpp)
 
 target_link_libraries(scrnsv PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
+
+target_link_options(scrnsv PRIVATE -mwindows) # NOTE: Без отображения cmd при запуске приложения вне IDE
