@@ -5,6 +5,22 @@
 #include <QPixmap>
 #include <QScreen>
 
+namespace
+{
+    QRect totalGeometry(const QList<QScreen*>& screens)
+    {
+        QRect total;
+
+        for (QScreen* screen : screens)
+        {
+            if (screen)
+                total = total.united(screen->geometry());
+        }
+
+        return total;
+    }
+}
+
 Screenshot::Screenshot(QObject* parent)
     : QObject(parent)
 {}
@@ -21,6 +37,11 @@ void Screenshot::shotAreaScreen()
 
 void Screenshot::shotFullScreen()
 {
-    QScreen* screen = qApp->screens().at(0);
-    emit ready(screen->grabWindow(0));
+    const QList<QScreen*> screens = qApp->screens();
+
+    if (!screens.isEmpty())
+    {
+        const QRect area = totalGeometry(screens);
+        emit ready(screens.at(0)->grabWindow(0, area.x(), area.y(), area.width(), area.height()));
+    }
 }
