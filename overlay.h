@@ -8,7 +8,7 @@ class Overlay : public QWidget
     Q_OBJECT
 
 public:
-    explicit Overlay(QScreen* screen);
+    explicit Overlay();
 
 signals:
     void selected(const QRect& area);

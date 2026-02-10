@@ -4,7 +4,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-Overlay::Overlay(QScreen* screen)
+Overlay::Overlay()
     : QWidget(nullptr)
 {    
     setAttribute(Qt::WA_TranslucentBackground);
