@@ -8,11 +8,7 @@ OverlayWidget::OverlayWidget(QWidget* parent)
     : QWidget(parent)
 {
     setAttribute(Qt::WA_TranslucentBackground);
-    setAttribute(Qt::WA_DeleteOnClose);
-
-    setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
-
-    setWindowState(Qt::WindowFullScreen);
+    setWindowFlags(Qt::FramelessWindowHint);
 }
 
 void OverlayWidget::paintEvent(QPaintEvent* event)
