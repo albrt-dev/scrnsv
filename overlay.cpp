@@ -1,62 +1,64 @@
 #include "overlay.h"
 
-#include <QApplication>
-#include <QMouseEvent>
-#include <QPainter>
+#include "overlaywidget.h"
 
-Overlay::Overlay()
-    : QWidget(nullptr)
-{    
-    setAttribute(Qt::WA_TranslucentBackground);
-    setAttribute(Qt::WA_DeleteOnClose);
+#include <QScreen>
 
-    setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
+class OverlayPrivate
+{
+public:
+    OverlayPrivate(Overlay* qq) : q(qq) {}
 
-    setWindowState(Qt::WindowFullScreen);
+    void show()
+    {
+        for (QScreen* screen : std::as_const(screens))
+        {
+            OverlayWidget* widget = new OverlayWidget();
+            widget->setGeometry(screen->geometry());
+
+            QObject::connect(widget, &OverlayWidget::selected, q, [this, screen](const QRect& area){ emit q->selected(screen, area); });
+
+            widget->show();
+
+            widgets.append(widget);
+        }
+    }
+
+    void hide()
+    {
+        for (OverlayWidget* widget : std::as_const(widgets))
+        {
+            widget->hide();
+            widget->deleteLater();
+        }
+
+        widgets.clear();
+    }
+
+    Overlay*              q;
+
+    QList<QScreen*>       screens;
+    QList<OverlayWidget*> widgets;
+};
+
+Overlay::Overlay(QObject* parent)
+    : QObject(parent)
+    , d_(new OverlayPrivate(this))
+{}
+
+Overlay::~Overlay() = default;
+
+void Overlay::setScreens(const QList<QScreen*>& screens)
+{
+    d_->screens = screens;
 }
 
-void Overlay::paintEvent(QPaintEvent* event)
+void Overlay::show()
 {
-    QPainter painter(this);
-
-    painter.fillRect(rect(), QColor(0, 0, 0, 127));
-
-    painter.setCompositionMode(QPainter::CompositionMode_Clear);
-    painter.fillRect(area_.normalized(), Qt::transparent);
-    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-    painter.setPen(QPen(Qt::white, 1, Qt::DashLine));
-    painter.drawRect(area_.normalized());
+    d_->show();
 }
 
-void Overlay::showEvent(QShowEvent* event)
+void Overlay::hide()
 {
-    qApp->setOverrideCursor(Qt::CrossCursor);
-    qApp->overrideCursor();
-}
-
-void Overlay::hideEvent(QHideEvent* event)
-{
-    qApp->restoreOverrideCursor();
-    close();
-}
-
-void Overlay::mousePressEvent(QMouseEvent* event)
-{
-    area_.setTopLeft(event->pos());
-    area_.setBottomRight(event->pos());
-
-    update();
-}
-
-void Overlay::mouseMoveEvent(QMouseEvent* event)
-{
-    area_.setBottomRight(event->pos());
-
-    update();
-}
-
-void Overlay::mouseReleaseEvent(QMouseEvent* event)
-{
-    emit selected(area_.normalized());
+    d_->hide();
 }

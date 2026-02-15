@@ -19,6 +19,16 @@ namespace
 
         return total;
     }
+
+    QPixmap screenImage(QScreen* screen, const QRect& rect)
+    {
+        QPixmap image;
+
+        if (screen)
+            image = screen->grabWindow(0, rect.x(), rect.y(), rect.width(), rect.height());
+
+        return image;
+    }
 }
 
 Screenshot::Screenshot(QObject* parent)
@@ -27,12 +37,27 @@ Screenshot::Screenshot(QObject* parent)
 
 void Screenshot::shotAreaScreen()
 {
-    QScreen* screen = qApp->screens().at(0);
+    const QList<QScreen*> screens = qApp->screens();
 
-    Overlay* overlay = new Overlay();
-    connect(overlay, &Overlay::selected, this, [this, screen, overlay](const QRect& rect)
-            { overlay->hide(); emit ready(screen->grabWindow(0, rect.x(), rect.y(), rect.width(), rect.height())); });
-    overlay->show();
+    if (!screens.isEmpty())
+    {
+        Overlay* overlay = new Overlay;
+        overlay->setScreens(screens);
+
+        const auto grabArea = [this, overlay](QScreen* screen, const QRect& rect)
+        {
+            overlay->hide();
+
+            const QPixmap image = screenImage(screen, rect);
+
+            if (!image.isNull())
+                emit ready(image);
+        };
+
+        connect(overlay, &Overlay::selected, this, grabArea);
+
+        overlay->show();
+    }
 }
 
 void Screenshot::shotFullScreen()

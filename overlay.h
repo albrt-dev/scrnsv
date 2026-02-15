@@ -1,30 +1,29 @@
 #ifndef OVERLAY_H
 #define OVERLAY_H
 
-#include <QWidget>
+#include <QObject>
 
-class Overlay : public QWidget
+class QScreen;
+
+class Overlay : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Overlay();
+    explicit Overlay(QObject* parent = nullptr);
+    ~Overlay() override;
+
+    void setScreens(const QList<QScreen*>& screens);
+
+public slots:
+    void show();
+    void hide();
 
 signals:
-    void selected(const QRect& area);
-
-protected:
-    void paintEvent(QPaintEvent* event) override;
-
-    void showEvent(QShowEvent* event) override;
-    void hideEvent(QHideEvent* event) override;
-
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseMoveEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
+    void selected(QScreen* screen, const QRect& area);
 
 private:
-    QRect area_;
+    QScopedPointer<class OverlayPrivate> d_;
 };
 
 #endif // OVERLAY_H
