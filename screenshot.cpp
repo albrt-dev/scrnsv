@@ -29,6 +29,21 @@ namespace
 
         return image;
     }
+
+    QPixmap fullScreenImage(const QList<QScreen*>& screens)
+    {
+        QPixmap image;
+
+        if (!screens.isEmpty())
+        {
+            const QRect area = totalGeometry(screens);
+
+            // NOTE: Используем первый монитор, так как его достаточно, чтобы заскринить объединенную область мониторов
+            image = screenImage(screens.at(0), area);
+        }
+
+        return image;
+    }
 }
 
 Screenshot::Screenshot(QObject* parent)
@@ -62,11 +77,8 @@ void Screenshot::shotAreaScreen()
 
 void Screenshot::shotFullScreen()
 {
-    const QList<QScreen*> screens = qApp->screens();
+    const QPixmap image = fullScreenImage(qApp->screens());
 
-    if (!screens.isEmpty())
-    {
-        const QRect area = totalGeometry(screens);
-        emit ready(screens.at(0)->grabWindow(0, area.x(), area.y(), area.width(), area.height()));
-    }
+    if (!image.isNull())
+        emit ready(image);
 }
